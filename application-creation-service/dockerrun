@@ -1,0 +1,1 @@
+docker run -dit -p 8083:8083 mishas-stuff/application-creation-service --link camunda-engine

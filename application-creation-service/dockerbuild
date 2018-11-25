@@ -1,0 +1,1 @@
+docker build -t mishas-stuff/application-creation-service .

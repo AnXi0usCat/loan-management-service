@@ -1,0 +1,80 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<bpmn:definitions xmlns:bpmn="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:di="http://www.omg.org/spec/DD/20100524/DI" xmlns:dc="http://www.omg.org/spec/DD/20100524/DC" xmlns:camunda="http://camunda.org/schema/1.0/bpmn" id="Definitions_1ol8rfy" targetNamespace="http://bpmn.io/schema/bpmn" exporter="Camunda Modeler" exporterVersion="2.0.1">
+  <bpmn:process id="lending-process" name="Lending Process" isExecutable="true" camunda:versionTag="1.5.0">
+    <bpmn:startEvent id="start" name="Start">
+      <bpmn:outgoing>SequenceFlow_0y8vc6i</bpmn:outgoing>
+    </bpmn:startEvent>
+    <bpmn:endEvent id="end" name="End">
+      <bpmn:incoming>SequenceFlow_16n1t07</bpmn:incoming>
+    </bpmn:endEvent>
+    <bpmn:sequenceFlow id="SequenceFlow_0y8vc6i" sourceRef="start" targetRef="applicationCreationService" />
+    <bpmn:sequenceFlow id="SequenceFlow_0qr10ig" sourceRef="applicationProcessingService" targetRef="loanCreationService" />
+    <bpmn:serviceTask id="applicationProcessingService" name="Application Processing Service" camunda:type="external" camunda:topic="processApplication">
+      <bpmn:incoming>SequenceFlow_04ovoiv</bpmn:incoming>
+      <bpmn:outgoing>SequenceFlow_0qr10ig</bpmn:outgoing>
+    </bpmn:serviceTask>
+    <bpmn:sequenceFlow id="SequenceFlow_04ovoiv" sourceRef="applicationCreationService" targetRef="applicationProcessingService" />
+    <bpmn:serviceTask id="applicationCreationService" name="Application Creation Service" camunda:type="external" camunda:topic="createApplication">
+      <bpmn:incoming>SequenceFlow_0y8vc6i</bpmn:incoming>
+      <bpmn:outgoing>SequenceFlow_04ovoiv</bpmn:outgoing>
+    </bpmn:serviceTask>
+    <bpmn:sequenceFlow id="SequenceFlow_146r3fk" sourceRef="loanCreationService" targetRef="moneyIssuingService" />
+    <bpmn:serviceTask id="loanCreationService" name="Loan Creation Service" camunda:type="external" camunda:topic="createLoan">
+      <bpmn:incoming>SequenceFlow_0qr10ig</bpmn:incoming>
+      <bpmn:outgoing>SequenceFlow_146r3fk</bpmn:outgoing>
+    </bpmn:serviceTask>
+    <bpmn:sequenceFlow id="SequenceFlow_16n1t07" sourceRef="moneyIssuingService" targetRef="end" />
+    <bpmn:serviceTask id="moneyIssuingService" name="Money Issuing Service" camunda:type="external" camunda:topic="issueMoney">
+      <bpmn:incoming>SequenceFlow_146r3fk</bpmn:incoming>
+      <bpmn:outgoing>SequenceFlow_16n1t07</bpmn:outgoing>
+    </bpmn:serviceTask>
+  </bpmn:process>
+  <bpmndi:BPMNDiagram id="BPMNDiagram_1">
+    <bpmndi:BPMNPlane id="BPMNPlane_1" bpmnElement="lending-process">
+      <bpmndi:BPMNShape id="_BPMNShape_StartEvent_2" bpmnElement="start">
+        <dc:Bounds x="344" y="289" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="350" y="332" width="24" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="EndEvent_06hrq2i_di" bpmnElement="end">
+        <dc:Bounds x="1119" y="289" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="1127" y="332" width="20" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge id="SequenceFlow_0y8vc6i_di" bpmnElement="SequenceFlow_0y8vc6i">
+        <di:waypoint x="380" y="307" />
+        <di:waypoint x="446" y="307" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="SequenceFlow_0qr10ig_di" bpmnElement="SequenceFlow_0qr10ig">
+        <di:waypoint x="723" y="307" />
+        <di:waypoint x="784" y="307" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNShape id="ServiceTask_0eudo8p_di" bpmnElement="applicationProcessingService">
+        <dc:Bounds x="623" y="267" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge id="SequenceFlow_04ovoiv_di" bpmnElement="SequenceFlow_04ovoiv">
+        <di:waypoint x="546" y="307" />
+        <di:waypoint x="623" y="307" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNShape id="ServiceTask_1wfm572_di" bpmnElement="applicationCreationService">
+        <dc:Bounds x="446" y="267" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge id="SequenceFlow_146r3fk_di" bpmnElement="SequenceFlow_146r3fk">
+        <di:waypoint x="884" y="307" />
+        <di:waypoint x="947" y="307" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNShape id="ServiceTask_1j4hasx_di" bpmnElement="loanCreationService">
+        <dc:Bounds x="784" y="267" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge id="SequenceFlow_16n1t07_di" bpmnElement="SequenceFlow_16n1t07">
+        <di:waypoint x="1047" y="307" />
+        <di:waypoint x="1119" y="307" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNShape id="ServiceTask_1x9dkl9_di" bpmnElement="moneyIssuingService">
+        <dc:Bounds x="947" y="267" width="100" height="80" />
+      </bpmndi:BPMNShape>
+    </bpmndi:BPMNPlane>
+  </bpmndi:BPMNDiagram>
+</bpmn:definitions>

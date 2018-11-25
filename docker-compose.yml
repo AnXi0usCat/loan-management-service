@@ -1,0 +1,22 @@
+version: '3'
+services:
+  application-creation-service:
+    build: application-creation-service/.
+    ports: 
+     - "8083:8083"
+  application-processing-service:
+    build: application-processing-service/.
+    ports:
+     - "8084:8084"
+  loan-creation-service:
+    build: loan-creation-service/.
+    ports:
+     - "8085:8085"
+  money-issuing-service:
+    build: money-issuing-service/.
+    ports:
+     - "8086:8086"
+  camunda-engine:
+    image: "camunda/camunda-bpm-platform:latest"
+    ports:
+     - "8080:8080"
