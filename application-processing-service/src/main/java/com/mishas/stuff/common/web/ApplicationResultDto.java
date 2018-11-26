@@ -48,5 +48,4 @@ public class ApplicationResultDto implements Serializable {
     public int hashCode() {
         return Objects.hash(applicationId, approved);
     }
-
 }
