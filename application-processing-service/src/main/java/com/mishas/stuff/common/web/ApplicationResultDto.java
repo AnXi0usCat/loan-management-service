@@ -39,13 +39,23 @@ public class ApplicationResultDto implements Serializable {
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
-        ApplicationResultDto resultDto = (ApplicationResultDto) o;
-        return approved == resultDto.approved &&
-                Objects.equals(applicationId, resultDto.applicationId);
+        ApplicationResultDto that = (ApplicationResultDto) o;
+        return isApproved() == that.isApproved() &&
+                getLoanAmount() == that.getLoanAmount() &&
+                Objects.equals(getApplicationId(), that.getApplicationId());
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(applicationId, approved);
+        return Objects.hash(getApplicationId(), isApproved(), getLoanAmount());
+    }
+
+    @Override
+    public String toString() {
+        return "ApplicationResultDto{" +
+                "applicationId='" + applicationId + '\'' +
+                ", approved=" + approved +
+                ", loanAmount=" + loanAmount +
+                '}';
     }
 }
