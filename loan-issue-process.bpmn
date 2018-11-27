@@ -1,80 +1,144 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<bpmn:definitions xmlns:bpmn="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:di="http://www.omg.org/spec/DD/20100524/DI" xmlns:dc="http://www.omg.org/spec/DD/20100524/DC" xmlns:camunda="http://camunda.org/schema/1.0/bpmn" id="Definitions_1ol8rfy" targetNamespace="http://bpmn.io/schema/bpmn" exporter="Camunda Modeler" exporterVersion="2.0.1">
-  <bpmn:process id="lending-process" name="Lending Process" isExecutable="true" camunda:versionTag="1.6.3">
+<bpmn:definitions xmlns:bpmn="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:di="http://www.omg.org/spec/DD/20100524/DI" xmlns:dc="http://www.omg.org/spec/DD/20100524/DC" xmlns:camunda="http://camunda.org/schema/1.0/bpmn" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" id="Definitions_1ol8rfy" targetNamespace="http://bpmn.io/schema/bpmn" exporter="Camunda Modeler" exporterVersion="2.0.1">
+  <bpmn:process id="lending-process" name="Lending Process" isExecutable="true" camunda:versionTag="1.7.1">
     <bpmn:startEvent id="start" name="Start">
       <bpmn:outgoing>SequenceFlow_0y8vc6i</bpmn:outgoing>
     </bpmn:startEvent>
     <bpmn:endEvent id="success" name="Success">
-      <bpmn:incoming>SequenceFlow_16n1t07</bpmn:incoming>
+      <bpmn:incoming>SequenceFlow_07c4yp0</bpmn:incoming>
     </bpmn:endEvent>
     <bpmn:sequenceFlow id="SequenceFlow_0y8vc6i" sourceRef="start" targetRef="applicationCreationService" />
     <bpmn:serviceTask id="applicationProcessingService" name="Application Processing Service" camunda:type="external" camunda:topic="processApplication">
       <bpmn:incoming>SequenceFlow_04ovoiv</bpmn:incoming>
-      <bpmn:outgoing>SequenceFlow_0j208vt</bpmn:outgoing>
+      <bpmn:outgoing>SequenceFlow_12a88dv</bpmn:outgoing>
     </bpmn:serviceTask>
     <bpmn:sequenceFlow id="SequenceFlow_04ovoiv" sourceRef="applicationCreationService" targetRef="applicationProcessingService" />
     <bpmn:serviceTask id="applicationCreationService" name="Application Creation Service" camunda:type="external" camunda:topic="createApplication">
       <bpmn:incoming>SequenceFlow_0y8vc6i</bpmn:incoming>
       <bpmn:outgoing>SequenceFlow_04ovoiv</bpmn:outgoing>
     </bpmn:serviceTask>
-    <bpmn:sequenceFlow id="SequenceFlow_146r3fk" sourceRef="loanCreationService" targetRef="moneyIssuingService" />
     <bpmn:serviceTask id="loanCreationService" name="Loan Creation Service" camunda:type="external" camunda:topic="createLoan">
-      <bpmn:incoming>SequenceFlow_0j208vt</bpmn:incoming>
-      <bpmn:outgoing>SequenceFlow_146r3fk</bpmn:outgoing>
+      <bpmn:incoming>SequenceFlow_00swf67</bpmn:incoming>
+      <bpmn:outgoing>SequenceFlow_0ck5a0s</bpmn:outgoing>
     </bpmn:serviceTask>
-    <bpmn:sequenceFlow id="SequenceFlow_16n1t07" sourceRef="moneyIssuingService" targetRef="success" />
     <bpmn:serviceTask id="moneyIssuingService" name="Money Issuing Service" camunda:type="external" camunda:topic="issueMoney">
-      <bpmn:incoming>SequenceFlow_146r3fk</bpmn:incoming>
-      <bpmn:outgoing>SequenceFlow_16n1t07</bpmn:outgoing>
+      <bpmn:incoming>SequenceFlow_1cfeuqg</bpmn:incoming>
+      <bpmn:outgoing>SequenceFlow_104sxob</bpmn:outgoing>
     </bpmn:serviceTask>
-    <bpmn:sequenceFlow id="SequenceFlow_0j208vt" sourceRef="applicationProcessingService" targetRef="loanCreationService" />
+    <bpmn:sequenceFlow id="SequenceFlow_12a88dv" sourceRef="applicationProcessingService" targetRef="application_status" />
+    <bpmn:exclusiveGateway id="application_status" default="fail_application">
+      <bpmn:incoming>SequenceFlow_12a88dv</bpmn:incoming>
+      <bpmn:outgoing>SequenceFlow_1s1ca4v</bpmn:outgoing>
+      <bpmn:outgoing>fail_application</bpmn:outgoing>
+    </bpmn:exclusiveGateway>
+    <bpmn:sequenceFlow id="SequenceFlow_1s1ca4v" sourceRef="application_status" targetRef="ExclusiveGateway_0qf2srp">
+      <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression">${ JSON(applicationResult).prop("approved").boolValue() }</bpmn:conditionExpression>
+    </bpmn:sequenceFlow>
+    <bpmn:endEvent id="failure" name="Application Declined">
+      <bpmn:incoming>fail_application</bpmn:incoming>
+    </bpmn:endEvent>
+    <bpmn:sequenceFlow id="fail_application" sourceRef="application_status" targetRef="failure" />
+    <bpmn:sequenceFlow id="SequenceFlow_00swf67" sourceRef="ExclusiveGateway_0qf2srp" targetRef="loanCreationService" />
+    <bpmn:sequenceFlow id="SequenceFlow_1cfeuqg" sourceRef="ExclusiveGateway_0qf2srp" targetRef="moneyIssuingService" />
+    <bpmn:sequenceFlow id="SequenceFlow_0ck5a0s" sourceRef="loanCreationService" targetRef="ExclusiveGateway_05jr03m" />
+    <bpmn:sequenceFlow id="SequenceFlow_104sxob" sourceRef="moneyIssuingService" targetRef="ExclusiveGateway_05jr03m" />
+    <bpmn:sequenceFlow id="SequenceFlow_07c4yp0" sourceRef="ExclusiveGateway_05jr03m" targetRef="success" />
+    <bpmn:parallelGateway id="ExclusiveGateway_0qf2srp">
+      <bpmn:incoming>SequenceFlow_1s1ca4v</bpmn:incoming>
+      <bpmn:outgoing>SequenceFlow_00swf67</bpmn:outgoing>
+      <bpmn:outgoing>SequenceFlow_1cfeuqg</bpmn:outgoing>
+    </bpmn:parallelGateway>
+    <bpmn:inclusiveGateway id="ExclusiveGateway_05jr03m" camunda:asyncBefore="true">
+      <bpmn:incoming>SequenceFlow_0ck5a0s</bpmn:incoming>
+      <bpmn:incoming>SequenceFlow_104sxob</bpmn:incoming>
+      <bpmn:outgoing>SequenceFlow_07c4yp0</bpmn:outgoing>
+    </bpmn:inclusiveGateway>
   </bpmn:process>
   <bpmndi:BPMNDiagram id="BPMNDiagram_1">
     <bpmndi:BPMNPlane id="BPMNPlane_1" bpmnElement="lending-process">
       <bpmndi:BPMNShape id="_BPMNShape_StartEvent_2" bpmnElement="start">
-        <dc:Bounds x="344" y="289" width="36" height="36" />
+        <dc:Bounds x="367" y="289" width="36" height="36" />
         <bpmndi:BPMNLabel>
-          <dc:Bounds x="350" y="332" width="24" height="14" />
+          <dc:Bounds x="373" y="332" width="24" height="14" />
         </bpmndi:BPMNLabel>
       </bpmndi:BPMNShape>
       <bpmndi:BPMNShape id="EndEvent_06hrq2i_di" bpmnElement="success">
-        <dc:Bounds x="1206" y="289" width="36" height="36" />
+        <dc:Bounds x="1209" y="289" width="36" height="36" />
         <bpmndi:BPMNLabel>
-          <dc:Bounds x="1203" y="332" width="42" height="14" />
+          <dc:Bounds x="1206" y="332" width="42" height="14" />
         </bpmndi:BPMNLabel>
       </bpmndi:BPMNShape>
       <bpmndi:BPMNEdge id="SequenceFlow_0y8vc6i_di" bpmnElement="SequenceFlow_0y8vc6i">
-        <di:waypoint x="380" y="307" />
-        <di:waypoint x="446" y="307" />
+        <di:waypoint x="403" y="307" />
+        <di:waypoint x="456" y="307" />
       </bpmndi:BPMNEdge>
       <bpmndi:BPMNShape id="ServiceTask_0eudo8p_di" bpmnElement="applicationProcessingService">
         <dc:Bounds x="623" y="267" width="100" height="80" />
       </bpmndi:BPMNShape>
       <bpmndi:BPMNEdge id="SequenceFlow_04ovoiv_di" bpmnElement="SequenceFlow_04ovoiv">
-        <di:waypoint x="546" y="307" />
+        <di:waypoint x="556" y="307" />
         <di:waypoint x="623" y="307" />
       </bpmndi:BPMNEdge>
       <bpmndi:BPMNShape id="ServiceTask_1wfm572_di" bpmnElement="applicationCreationService">
-        <dc:Bounds x="446" y="267" width="100" height="80" />
+        <dc:Bounds x="456" y="267" width="100" height="80" />
       </bpmndi:BPMNShape>
-      <bpmndi:BPMNEdge id="SequenceFlow_146r3fk_di" bpmnElement="SequenceFlow_146r3fk">
-        <di:waypoint x="971" y="307" />
-        <di:waypoint x="1051" y="307" />
-      </bpmndi:BPMNEdge>
       <bpmndi:BPMNShape id="ServiceTask_1j4hasx_di" bpmnElement="loanCreationService">
-        <dc:Bounds x="871" y="267" width="100" height="80" />
+        <dc:Bounds x="975" y="180" width="100" height="80" />
       </bpmndi:BPMNShape>
-      <bpmndi:BPMNEdge id="SequenceFlow_16n1t07_di" bpmnElement="SequenceFlow_16n1t07">
-        <di:waypoint x="1151" y="307" />
-        <di:waypoint x="1206" y="307" />
-      </bpmndi:BPMNEdge>
       <bpmndi:BPMNShape id="ServiceTask_1x9dkl9_di" bpmnElement="moneyIssuingService">
-        <dc:Bounds x="1051" y="267" width="100" height="80" />
+        <dc:Bounds x="975" y="361" width="100" height="80" />
       </bpmndi:BPMNShape>
-      <bpmndi:BPMNEdge id="SequenceFlow_0j208vt_di" bpmnElement="SequenceFlow_0j208vt">
+      <bpmndi:BPMNEdge id="SequenceFlow_12a88dv_di" bpmnElement="SequenceFlow_12a88dv">
         <di:waypoint x="723" y="307" />
-        <di:waypoint x="871" y="307" />
+        <di:waypoint x="775" y="307" />
       </bpmndi:BPMNEdge>
+      <bpmndi:BPMNShape id="ExclusiveGateway_1tn5aiv_di" bpmnElement="application_status" isMarkerVisible="true">
+        <dc:Bounds x="775" y="282" width="50" height="50" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge id="SequenceFlow_1s1ca4v_di" bpmnElement="SequenceFlow_1s1ca4v">
+        <di:waypoint x="825" y="307" />
+        <di:waypoint x="894" y="307" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNShape id="EndEvent_08hxvqz_di" bpmnElement="failure">
+        <dc:Bounds x="782" y="169" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="775" y="139" width="54" height="27" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge id="SequenceFlow_0owrqhf_di" bpmnElement="fail_application">
+        <di:waypoint x="800" y="282" />
+        <di:waypoint x="800" y="205" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="SequenceFlow_00swf67_di" bpmnElement="SequenceFlow_00swf67">
+        <di:waypoint x="919" y="282" />
+        <di:waypoint x="919" y="220" />
+        <di:waypoint x="975" y="220" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="SequenceFlow_1cfeuqg_di" bpmnElement="SequenceFlow_1cfeuqg">
+        <di:waypoint x="919" y="332" />
+        <di:waypoint x="919" y="401" />
+        <di:waypoint x="975" y="401" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="SequenceFlow_0ck5a0s_di" bpmnElement="SequenceFlow_0ck5a0s">
+        <di:waypoint x="1075" y="220" />
+        <di:waypoint x="1127" y="220" />
+        <di:waypoint x="1127" y="282" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="SequenceFlow_104sxob_di" bpmnElement="SequenceFlow_104sxob">
+        <di:waypoint x="1075" y="401" />
+        <di:waypoint x="1127" y="401" />
+        <di:waypoint x="1127" y="332" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="SequenceFlow_07c4yp0_di" bpmnElement="SequenceFlow_07c4yp0">
+        <di:waypoint x="1152" y="307" />
+        <di:waypoint x="1209" y="307" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNShape id="ParallelGateway_0jvuz9u_di" bpmnElement="ExclusiveGateway_0qf2srp">
+        <dc:Bounds x="894" y="282" width="50" height="50" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="InclusiveGateway_03evsb5_di" bpmnElement="ExclusiveGateway_05jr03m">
+        <dc:Bounds x="1102" y="282" width="50" height="50" />
+      </bpmndi:BPMNShape>
     </bpmndi:BPMNPlane>
   </bpmndi:BPMNDiagram>
 </bpmn:definitions>

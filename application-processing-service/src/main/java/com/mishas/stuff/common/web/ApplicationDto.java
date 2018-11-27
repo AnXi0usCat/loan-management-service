@@ -1,8 +1,8 @@
 package com.mishas.stuff.common.web;
 
-
 import javax.validation.constraints.NotNull;
 import java.io.Serializable;
+import java.util.Objects;
 
 public class ApplicationDto implements Serializable {
 
@@ -15,6 +15,7 @@ public class ApplicationDto implements Serializable {
             String firstname,
             String surname,
             int loanAmount) {
+
 
         this.id = id;
         this.firstname = firstname;
@@ -48,28 +49,28 @@ public class ApplicationDto implements Serializable {
     }
 
     @Override
-    public int hashCode() {
-        final int prime = 31;
-        int result = 1;
-        result = prime * result + ((firstname == null) ? 0 : firstname.hashCode());
-        return result;
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        ApplicationDto that = (ApplicationDto) o;
+        return getLoanAmount() == that.getLoanAmount() &&
+                Objects.equals(getId(), that.getId()) &&
+                Objects.equals(getFirstname(), that.getFirstname()) &&
+                Objects.equals(getSurname(), that.getSurname());
     }
 
     @Override
-    public boolean equals(final Object obj) {
-        if (this == obj)
-            return true;
-        if (obj == null)
-            return false;
-        if (getClass() != obj.getClass())
-            return false;
-        final ApplicationDto other = (ApplicationDto) obj;
-        if (firstname == null) {
-            if (other.firstname != null)
-                return false;
-        } else if (!firstname.equals(other.firstname))
-            return false;
-        return true;
+    public int hashCode() {
+        return Objects.hash(getId(), getFirstname(), getSurname(), getLoanAmount());
     }
 
+    @Override
+    public String toString() {
+        return "ApplicationDto{" +
+                "id='" + id + '\'' +
+                ", firstname='" + firstname + '\'' +
+                ", surname='" + surname + '\'' +
+                ", loanAmount=" + loanAmount +
+                '}';
+    }
 }
