@@ -10,6 +10,8 @@ import org.springframework.stereotype.Component;
 import javax.annotation.PostConstruct;
 import java.util.Collections;
 
+import static org.camunda.spin.Spin.JSON;
+
 @Component
 public class ApplicationCreationExternalTaskClient {
 
@@ -39,7 +41,8 @@ public class ApplicationCreationExternalTaskClient {
                                 externalTask.getVariable("loanAmount")
                         );
                         externalTaskService.complete(externalTask,
-                                Collections.singletonMap("application", applicationDto));
+                                Collections.singletonMap("application", JSON(applicationDto).toString())
+                        );
 
                     } catch(Exception e) {
                         LOGGER.error("Camunda Error Occured: " + e.getMessage());

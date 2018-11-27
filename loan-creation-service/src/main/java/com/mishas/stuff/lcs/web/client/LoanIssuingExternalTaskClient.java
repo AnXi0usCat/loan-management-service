@@ -12,6 +12,8 @@ import org.springframework.stereotype.Component;
 import javax.annotation.PostConstruct;
 import java.util.Collections;
 
+import static org.camunda.spin.Spin.JSON;
+
 @Component
 public class LoanIssuingExternalTaskClient {
 
@@ -26,8 +28,8 @@ public class LoanIssuingExternalTaskClient {
                 .create() // Initiate the ExternalTaskClientBuilder
                 .baseUrl("http://camunda-engine:8080/engine-rest") // URL of the REST API of the Process Engine
                 .maxTasks(1)
-      		.asyncResponseTimeout(120000)
-		.lockDuration( 1000 ) // Long polling for 10 seconds (10000 milliseconds)
+      		    .asyncResponseTimeout(120000)
+		        .lockDuration( 1000 ) // Long polling for 10 seconds (10000 milliseconds)
                 .build();
 
         externalTaskClient
@@ -35,13 +37,16 @@ public class LoanIssuingExternalTaskClient {
                 .handler ((externalTask, externalTaskService) -> {
                     try {
                         // create a DTO
-                        ApplicationResultDto applicatioResultDto = externalTask.getVariable("applicationResult");
+                        ApplicationResultDto applicatioResultDto = JSON(
+                                externalTask.getVariable("applicationResult")
+                        ).mapTo(ApplicationResultDto.class);
 
                         // process the application
                         LoanDto loan = service.createLoan(applicatioResultDto);
 
                         externalTaskService.complete(externalTask,
-                                Collections.singletonMap("loan", loan));
+                                Collections.singletonMap("loan", JSON(loan).toString())
+                        );
 
                     } catch(Exception e) {
                         LOGGER.error("Camunda Error Occured: " + e.getMessage());

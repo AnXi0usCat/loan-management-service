@@ -43,6 +43,13 @@
             <version>1.0.0</version>
         </dependency>
 
+        <!-- json mapper for Camunda-->
+        <dependency>
+            <groupId>org.camunda.spin</groupId>
+            <artifactId>camunda-spin-dataformat-json-jackson</artifactId>
+            <version>1.6.3</version>
+        </dependency>
+
     </dependencies>
 
 
